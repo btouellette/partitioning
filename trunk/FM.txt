@@ -1,0 +1,3 @@
+gain(x) = hyperedges where x is only node on side - hyperedges where all nodes (including x) are in one partition
+on move:
+	update gains for neighbors (change buckets)
