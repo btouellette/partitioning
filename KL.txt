@@ -1,0 +1,15 @@
+1) partition into two equal sets
+2) while cutsize improving:
+	while unlocked pairs:
+		exchange vertex pair with most positive gain
+		lock those vertices
+
+record best solution (minimum cut size) and start each pass from there
+keep priority queue of vertex pairs:
+	instantiate all at beginning
+	pull from top of queue until pair isn't locked
+		keep pointer to struct that records whether pair is locked
+		at end of pass change what number represents a lock (0->1 or 1->0) to swap all
+	gain(x,y) = e(x) + e(y) - i(x) - i(y) - 2*c(x,y)
+on swap:
+	update neighbors gain values (if they aren't locked)
