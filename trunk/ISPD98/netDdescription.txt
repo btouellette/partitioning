@@ -1,0 +1,12 @@
+Net Format
+
+Each netlist header has five entries which are 
+ignored 
+#Pins
+#Nets
+#Modules
+pad offset
+
+The list of nets follows. Each net is simply a subset of modules which are either cells or pads. Cells are numbered from 0 to pad offset (inclusive). Pads are numbered from 1 to (#Modules - pad offset - 1). (Please do not blame me for the unintuitive numbering scheme). Cells are prefaced by an "a", pads by a "p". The beginning of each net is denoted by an "s".
+
+Finally, .netD is just like .net except that each module in a net is labeled as either an input (I), output (O) or bidirectional (B) pin for that net. In other words, If a module is labeled with an I, it is a sink for the net; if it is labeled with an O, it is a source for the net. This can enable one to deduce signal directions over the circuit.
