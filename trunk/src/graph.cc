@@ -8,12 +8,22 @@ Vertex::Vertex(char *name) {
 	}
 }
 
+void Vertex::addEdge(Edge *edge){
+	edges.push_front(edge);
+}
+
+void Vertex::addHyperedge(Hyperedge *hyperedge) {
+	nets.push_front(hyperedge);
+}
+
 void Edge::setSource(Vertex *vertex) {
 	source = vertex;
+	vertex->addEdge(this);
 }
 
 void Edge::setSink(Vertex *vertex) {
 	sink = vertex;
+	vertex->addEdge(this);
 }
 
 void Graph::addEdge(Edge *edge) {
@@ -27,10 +37,12 @@ void Graph::addEdge(Edge *edge, float weight) {
 
 Hyperedge::Hyperedge(Vertex *vertex) {
 	vertices.push_front(vertex);
+	vertex->addHyperedge(this);
 }
 
 void Hyperedge::addVertex(Vertex *vertex) {
 	vertices.push_front(vertex);
+	vertex->addHyperedge(this);
 }
 
 void Hypergraph::addNet(Hyperedge *hyperedge) {
