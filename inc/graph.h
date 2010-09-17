@@ -14,11 +14,26 @@ public:
 	friend std::ostream& operator<< (std::ostream&, const Vertex&);
 };
 
+class Edge {
+private:
+	Vertex *source;
+	Vertex *sink;
+public:
+	Edge() {}
+
+	void setSource(Vertex*);
+	void setSink(Vertex*);
+};
+
 class Graph {
 private:
-	std::list< std::pair<Vertex*, Vertex*> > edges;
+	std::list<Edge*> edges;
+	std::list<float> weights;
 public:
 	Graph() {}
+
+	void addEdge(Edge*);
+	void addEdge(Edge*, float);
 };
 
 class Hyperedge {
@@ -45,6 +60,7 @@ public:
 	Hypergraph() {}
 
 	void addNet(Hyperedge*);
+	Graph* convertToGraph();
 
 	friend std::ostream& operator<< (std::ostream&, const Hypergraph&);
 };

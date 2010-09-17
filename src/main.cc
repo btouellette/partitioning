@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
 	//std::cout << *hypergraph << std::endl;
 
 	// Call the appropriate starter function for the algorithm specified
-	if (strcmp(algorithm, "kl")) {
+	if (strcmp(algorithm, "kl") == 0) {
 		kl(num_runs);
-	} else if (strcmp(algorithm, "fm")) {
+	} else if (strcmp(algorithm, "fm") == 0) {
 		fm(num_runs);
 	} else {
 		printf("** Invalid algorithm. Algorithms supported: kl fm\n");
