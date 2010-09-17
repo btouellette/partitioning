@@ -1,7 +1,7 @@
 # Compiler to use
 CC=g++
 # Compiler flags
-CFLAGS=-c -Wall -Wextra
+CFLAGS=-g -c -Wall -Wextra
 # Name of the output binary
 BIN=part
 # Include directory (*.h)
@@ -11,7 +11,7 @@ SRCDIR=src
 # Output directory (*.o)
 OBJDIR=out
 # Objects that need to be built
-OBJS=$(OBJDIR)/main.o $(OBJDIR)/kl.o $(OBJDIR)/fm.o $(OBJDIR)/import.o
+OBJS=$(OBJDIR)/main.o $(OBJDIR)/kl.o $(OBJDIR)/fm.o $(OBJDIR)/import.o $(OBJDIR)/graph.o
 
 # Default all target builds single binary
 all: $(BIN)
