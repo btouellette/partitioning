@@ -5,11 +5,20 @@
 #include <iostream>
 #include <string>
 
+class Edge;
+class Hyperedge;
+
 class Vertex {
 private:
 	std::string label;
+	std::list<Edge*> edges;
+	std::list<Hyperedge*> nets;
+	float weight;
 public:
 	Vertex(char *name);
+
+	void addEdge(Edge*);
+	void addHyperedge(Hyperedge*);
 
 	friend std::ostream& operator<< (std::ostream&, const Vertex&);
 };
