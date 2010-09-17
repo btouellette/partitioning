@@ -8,6 +8,23 @@ Vertex::Vertex(char *name) {
 	}
 }
 
+void Edge::setSource(Vertex *vertex) {
+	source = vertex;
+}
+
+void Edge::setSink(Vertex *vertex) {
+	sink = vertex;
+}
+
+void Graph::addEdge(Edge *edge) {
+	edges.push_front(edge);
+}
+
+void Graph::addEdge(Edge *edge, float weight) {
+	edges.push_front(edge);
+	weights.push_front(weight);
+}
+
 Hyperedge::Hyperedge(Vertex *vertex) {
 	vertices.push_front(vertex);
 }
@@ -18,6 +35,14 @@ void Hyperedge::addVertex(Vertex *vertex) {
 
 void Hypergraph::addNet(Hyperedge *hyperedge) {
 	nets.push_front(hyperedge);
+}
+
+Graph* Hypergraph::convertToGraph() {
+	Graph *graph = new Graph();
+	list<Hyperedge*>::iterator it;
+	for (it = nets.begin(); it != nets.end(); it++) {
+	}
+	return graph;
 }
 
 ostream& operator<< (ostream &out, const Vertex &vertex) {
