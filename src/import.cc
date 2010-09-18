@@ -90,6 +90,7 @@ void parse_body() {
 
 		if (vertices[num] == NULL) {
 			vertices[num] = newVertex(name);
+			addVertex(hypergraph, vertices[num]);
 		}
 
 		// Check if we're starting a new net

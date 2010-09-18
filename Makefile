@@ -32,5 +32,8 @@ test: all
 clean:
 	@rm -rf out/* $(BIN)
 
+# For when modifying headers
+rebuild: clean all
+
 # Disable checking for files named all or clean
 .PHONY: all clean

@@ -41,11 +41,11 @@ int main(int argc, char *argv[]) {
 
 	// Import the entire file to the graph data structure
 	Hypergraph *hypergraph = import_graph(file);
-	//std::cout << *hypergraph << std::endl;
+	//printHypergraph(hypergraph);
 
 	// Call the appropriate starter function for the algorithm specified
 	if (strcmp(algorithm, "kl") == 0) {
-		kl(num_runs);
+		kl(convertToGraph(hypergraph), num_runs);
 	} else if (strcmp(algorithm, "fm") == 0) {
 		fm(num_runs);
 	} else {
