@@ -9,6 +9,7 @@ using namespace std;
 
 void initial_partition();
 int pass();
+int calc_gain();
 
 set<Vertex*> part_1, part_2;
 set<Vertex*> uncalculated_1, uncalculated_2, unlocked_1, unlocked_2;
@@ -19,7 +20,7 @@ void kl(Graph* in_graph, int num_runs) {
 	graph = in_graph;
 	for (int i = 0; i < num_runs; i++) {
 		initial_partition();
-		while (pass() != 0) {
+		while (pass() >= 0) {
 		}
 	}
 }
@@ -71,5 +72,16 @@ void initial_partition() {
 
 int pass() {
 	int max_gain = 0;
-	return 0;
+	// Unlock all vertices
+	unlocked_1.clear();
+	unlocked_2.clear();
+	unlocked_1 = part_1;
+	unlocked_2 = part_2;
+	// While we still have an unlocked pair to match
+	while (unlocked_1.size() + unlocked_2.size() >= 2) {
+	}
+	return max_gain;
+}
+
+int calc_gain() {
 }
