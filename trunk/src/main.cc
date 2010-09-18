@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
 	// Import the entire file to the graph data structure
 	Hypergraph *hypergraph = import_graph(file);
 	//printHypergraph(hypergraph);
+	Graph *graph = convertToGraph(hypergraph);
+	printGraph(graph);
 
 	// Call the appropriate starter function for the algorithm specified
 	if (strcmp(algorithm, "kl") == 0) {

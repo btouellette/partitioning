@@ -69,8 +69,16 @@ bool compare_edges_directed(Edge *first, Edge *second) {
 	return first->source < second->source;
 }
 
+bool merge_same_edges(Edge *first, Edge *second) {
+	if ((first->source == second->source && first->sink == second->sink) ||
+		(first->source == second->sink   && first->sink == second->source)) {
+		first->weight += second->weight;
+		return true;
+	}
+	return false;
+}
+
 Graph* convertToGraph(Hypergraph *hypergraph) {
-	//TODO: Merge edges!
 	// Create a new graph to insert all our edges into
 	// We'll take each net and form a clique out of it
 	Graph *graph = new Graph();
@@ -82,25 +90,38 @@ Graph* convertToGraph(Hypergraph *hypergraph) {
 	for (h_it = hypergraph->nets.begin(); h_it != hypergraph->nets.end(); h_it++) {
 		Hyperedge *net = *h_it;
 		list<Vertex*> vertices = net->vertices;
-		// Our weight is defined as 1/(K-1)
-		float weight = 1/(vertices.size()-1);
+		// Our weight is defined as 1/(k-1)
+		float weight = 1.0/(vertices.size()-1);
 		list<Vertex*>::iterator v_it;
 		// For every vertex in the net
 		for (v_it = vertices.begin(); v_it != vertices.end(); v_it++) {
 			Vertex *vertex1 = *v_it;
-			list<Vertex*> other_vertices = net->vertices;
 			list<Vertex*>::iterator v_it2;
 			// For every vertex in the net (again)
-			for (v_it2 = other_vertices.begin(); v_it2 != other_vertices.end(); v_it2++) {
+			for (v_it2 = vertices.begin(); v_it2 != vertices.end(); v_it2++) {
 				// Make an edge between this vertex and every other vertex in the net
+				// To avoid making edges both ways restrict the edges to point from the lower vertex to the higher one
 				Vertex *vertex2 = *v_it2;
-				if (vertex1 != vertex2) {
+				if (vertex1 != vertex2 && vertex1 < vertex2) {
 					addEdge(graph, newEdge(vertex1, vertex2, weight));
 				}
 			}
 		}
 	}
+	// Now merge duplicate edges
+	// We do this by sorting the list of edges and then merging consecutive elements
+	graph->edges.sort(compare_edges_undirected);
+	graph->edges.unique(merge_same_edges);
 	return graph;
+}
+
+void printGraph(Graph *graph) {
+	list<Edge*> edges = graph->edges;
+	list<Edge*>::iterator e_it;
+	// For every edge
+	for (e_it = edges.begin(); e_it != edges.end(); e_it++) {
+		cout << "Edge: " << (*e_it)->source->label << "-" << (*e_it)->sink->label << " " << (*e_it)->weight << endl;
+	}
 }
 
 void printHypergraph(Hypergraph *hypergraph) {
