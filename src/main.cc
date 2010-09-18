@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	int num_runs;
-	char *algorithm, *file;
+	int num_runs = 0;
+	char *algorithm = NULL, *file = NULL;
 	// Run through all the inputs on the command line
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-in") == 0) {
