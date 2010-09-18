@@ -25,8 +25,10 @@ void kl(Graph* in_graph, int num_runs) {
 }
 
 void initial_partition() {
-	// Randomly partition the vertices into sets
 	list<Vertex*>::iterator it;
+	// Seed the random number generator
+	srand(time(NULL));
+	// Randomly partition the vertices into sets
 	for (it = graph->vertices.begin(); it != graph->vertices.end(); it++) {
 		if (rand()%2) {
 			part_1.insert(*it);
@@ -41,7 +43,7 @@ void initial_partition() {
 	vector<Vertex*> vec;
 	if (size_1 > size_2) {
 		// Copy the relevant set into a vector 
-		copy(part_1.begin(), part_1.end(), vec.begin()); 
+		copy(part_1.begin(), part_1.end(), inserter(vec, vec.begin())); 
 		// Se we can randomly shuffle it in O(n)
 		random_shuffle(vec.begin(), vec.end());
 		vector<Vertex*>::iterator vec_it = vec.begin();
@@ -54,7 +56,7 @@ void initial_partition() {
 			size_2++;
 		}
 	} else if (size_2 > size_1) {
-		copy(part_2.begin(), part_2.end(), vec.begin()); 
+		copy(part_2.begin(), part_2.end(), inserter(vec, vec.begin())); 
 		random_shuffle(vec.begin(), vec.end());
 		vector<Vertex*>::iterator vec_it = vec.begin();
 		while (size_2 > size_1) {

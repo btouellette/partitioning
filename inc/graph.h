@@ -29,6 +29,7 @@ struct Graph {
 };
 
 void addEdge(Graph*, Edge*);
+void printGraph(Graph*);
 
 struct Hyperedge {
 	std::list<Vertex*> vertices;
