@@ -1,7 +1,7 @@
 # Compiler to use
 CC=g++
 # Compiler flags
-CFLAGS=-g -c -Wall -Wextra
+CFLAGS=-g -c -Wall -Wextra -O3
 # Name of the output binary
 BIN=part
 # Include directory (*.h)
