@@ -14,6 +14,8 @@ Edge* newEdge(Vertex* vertex1, Vertex* vertex2) {
 	Edge *edge = new Edge();
 	edge->source = vertex1;
 	edge->sink = vertex2;
+	vertex1->edges.push_front(edge);
+	vertex2->edges.push_front(edge);
 	return edge;
 }
 
@@ -21,14 +23,6 @@ Edge* newEdge(Vertex* vertex1, Vertex* vertex2, float edge_weight) {
 	Edge *edge = newEdge(vertex1, vertex2); 
 	edge->weight = edge_weight;
 	return edge;
-}
-
-void setSource(Edge *edge, Vertex *vertex) {
-	edge->source = vertex;
-}
-
-void setSink(Edge *edge, Vertex *vertex) {
-	edge->sink = vertex;
 }
 
 void addEdge(Graph *graph, Edge *edge) {
