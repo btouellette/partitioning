@@ -4,7 +4,6 @@ static void initial_partition() {
 }
 
 static int pass() {
-	int max_gain = 0;
 	return 0;
 }
 

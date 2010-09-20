@@ -3,11 +3,16 @@
 
 #include <list>
 #include <iostream>
+#include <set>
 #include <string>
+
+struct Edge;
 
 struct Vertex {
 	std::string label;
+	std::list<Edge*> edges;
 	float weight;
+	int partition;
 };
 
 Vertex* newVertex(char *name);
@@ -20,8 +25,6 @@ struct Edge {
 
 Edge* newEdge(Vertex*, Vertex*);
 Edge* newEdge(Vertex*, Vertex*, float);
-void setSource(Edge*, Vertex*);
-void setSink(Edge*, Vertex*);
 
 struct Graph {
 	std::list<Edge*> edges;
