@@ -31,6 +31,7 @@ struct Graph {
 	std::list<Vertex*> vertices;
 };
 
+void addVertex(Graph*, Vertex*);
 void addEdge(Graph*, Edge*);
 void printGraph(Graph*);
 
