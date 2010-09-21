@@ -10,12 +10,15 @@ Vertex* newVertex(char *name) {
 	return vertex;
 }
 
+void addEdgeToVertices(Edge *edge) {
+	edge->source->edges.push_front(edge);
+	edge->sink->edges.push_front(edge);
+}
+
 Edge* newEdge(Vertex* vertex1, Vertex* vertex2) {
 	Edge *edge = new Edge();
 	edge->source = vertex1;
 	edge->sink = vertex2;
-	vertex1->edges.push_front(edge);
-	vertex2->edges.push_front(edge);
 	return edge;
 }
 
@@ -55,12 +58,20 @@ bool compare_edges_undirected(Edge *first, Edge *second) {
 	// Compares the min vertex pointer from each edge
 	Vertex *vertex1 = (first->source < first->sink) ? first->source : first->sink;
 	Vertex *vertex2 = (second->source < second->sink) ? second->source : second->sink;
+	// If the min vertex is the same for each edge sort by the other
+	if (vertex1 == vertex2) {
+		vertex1 = (vertex1 == first->sink) ? first->source : first->sink;
+		vertex2 = (vertex2 == second->sink) ? second->source : second->sink;
+	}
 	return vertex1 < vertex2;
 }
 
 bool compare_edges_directed(Edge *first, Edge *second) {
 	// Compares the source from each edge
-	return first->source < second->source;
+	if (first->source != second->source) {
+		return first->source < second->source;
+	}
+	return first->sink < second->sink;
 }
 
 bool merge_same_edges(Edge *first, Edge *second) {
@@ -106,6 +117,11 @@ Graph* convertToGraph(Hypergraph *hypergraph) {
 	// We do this by sorting the list of edges and then merging consecutive elements
 	graph->edges.sort(compare_edges_undirected);
 	graph->edges.unique(merge_same_edges);
+	// Now populate the vertex lists with the appropriate edges after merging
+	list<Edge*>::iterator e_it;
+	for (e_it = graph->edges.begin(); e_it != graph->edges.end(); e_it++) {	
+		addEdgeToVertices(*e_it);
+	}
 	return graph;
 }
 
@@ -115,6 +131,14 @@ void printGraph(Graph *graph) {
 	// For every edge
 	for (e_it = edges.begin(); e_it != edges.end(); e_it++) {
 		cout << "Edge: " << (*e_it)->source->label << "-" << (*e_it)->sink->label << " " << (*e_it)->weight << endl;
+	}
+	list<Vertex*>::iterator v_it;
+	for (v_it = graph->vertices.begin(); v_it != graph->vertices.end(); v_it++) {
+		cout << "Vertex: " << (*v_it)->label << " " << (*v_it)->edges.size() << endl;
+		edges = (*v_it)->edges;
+		for (e_it = edges.begin(); e_it != edges.end(); e_it++) {
+			cout << "  Edge: " << (*e_it)->source->label << "-" << (*e_it)->sink->label << " " << (*e_it)->weight << endl;
+		}
 	}
 }
 

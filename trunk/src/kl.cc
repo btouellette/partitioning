@@ -20,7 +20,7 @@ Graph* graph;
 void kl(Graph* in_graph, int num_runs) {
 	graph = in_graph;
 	if(graph->vertices.size()%2 != 0) {
-		addVertex(graph, newVertex("dummy"));
+	//	addVertex(graph, newVertex("dummy"));
 	}
 	for (int i = 0; i < num_runs; i++) {
 		part_1.empty();
@@ -168,6 +168,7 @@ float pass() {
 float calc_gain(Vertex *vertex1, Vertex *vertex2) {
 	float gain = 0.0f;
 	int vertex1_part = vertex1->partition;
+	cout << vertex1->label << " " << vertex2->label << endl;
 	list<Edge*>::iterator it;
 	// Check all the edges out of the first vertex
 	for (it = vertex1->edges.begin(); it != vertex1->edges.end(); it++) {
@@ -184,7 +185,7 @@ float calc_gain(Vertex *vertex1, Vertex *vertex2) {
 			gain += edge->weight;
 		}
 	}
-	int vertex2_part = vertex1->partition;
+	int vertex2_part = vertex2->partition;
 	// Check all the edges out of the second vertex
 	for (it = vertex2->edges.begin(); it != vertex2->edges.end(); it++) {
 		Edge *edge = *it;
