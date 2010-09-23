@@ -26,7 +26,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.cc
 
 # Run single KL run on test netlist but don't show the command
 test: all
-	@./part -in ISPD98/test.netD -alg kl -runs 1
+	@./part -in ISPD98/ibm01.netD -alg kl -runs 1
 
 # Clean silently (@)
 clean:
