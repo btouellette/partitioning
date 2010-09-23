@@ -22,13 +22,14 @@ void kl(Graph* in_graph, int num_runs) {
 	if(graph->vertices.size()%2 != 0) {
 	//	addVertex(graph, newVertex("dummy"));
 	}
+	float best_cut = -FLT_MAX;
 	for (int i = 0; i < num_runs; i++) {
 		part_1.empty();
 		part_2.empty();
 		initial_partition();
 		float last_gain = 1.0f;
 		while (last_gain > 0.0f) {
-			cout << "===========" << endl;
+			/*cout << "===========" << endl;
 			set<Vertex*>::iterator it;
 			for (it = part_1.begin(); it != part_1.end(); it++) {
 				cout << (*it)->label << " ";
@@ -37,9 +38,9 @@ void kl(Graph* in_graph, int num_runs) {
 			for (it = part_2.begin(); it != part_2.end(); it++) {
 				cout << (*it)->label << " ";
 			}
-			cout << endl;
+			cout << endl;*/
 			last_gain = pass();
-			cout << "---------" << endl;
+			/*cout << "---------" << endl;
 			for (it = part_1.begin(); it != part_1.end(); it++) {
 				cout << (*it)->label << " ";
 			}
@@ -47,9 +48,13 @@ void kl(Graph* in_graph, int num_runs) {
 			for (it = part_2.begin(); it != part_2.end(); it++) {
 				cout << (*it)->label << " ";
 			}
-			cout << endl;
+			cout << endl;*/
+			cout << "Pass complete: " << last_gain << endl;
 		}
+		float new_cut = cut_size(graph);
+		best_cut = (best_cut < new_cut) ? new_cut : best_cut;
 	}
+	cout << "Best cut in " << num_runs << " runs of KL: " << best_cut << endl;
 }
 
 void initial_partition() {
@@ -119,7 +124,7 @@ float pass() {
 			set<Vertex*>::iterator it_2;
 			for (it_2 = unlocked_2.begin(); it_2 != unlocked_2.end(); it_2++) {
 				float gain = calc_gain(*it_1, *it_2);
-				cout << "gain: " << gain << endl;
+				//cout << "gain: " << gain << endl;
 				if (gain > max_gain) {
 					vertex1 = *it_1;
 					vertex2 = *it_2;
@@ -127,7 +132,7 @@ float pass() {
 				}
 			}
 		}
-		cout << "******" << endl;
+		//cout << "******" << endl;
 		// Swap the partition labels of the two so future gain calcs are correct
 		vertex1->partition = 2;
 		vertex2->partition = 1;
@@ -154,7 +159,7 @@ float pass() {
 		part_2.insert(v_pair.first);
 		part_2.erase(v_pair.second);
 		part_1.insert(v_pair.second);
-		cout << "swapped " << v_pair.first->label << " " << v_pair.second->label << endl;
+		//cout << "swapped " << v_pair.first->label << " " << v_pair.second->label << endl;
 	}
 	// Undo the partition changes we wrote into the vertices swapped since the best gain
 	for (it = swaps_since_best.begin(); it != swaps_since_best.end(); it++) {
@@ -168,7 +173,7 @@ float pass() {
 float calc_gain(Vertex *vertex1, Vertex *vertex2) {
 	float gain = 0.0f;
 	int vertex1_part = vertex1->partition;
-	cout << vertex1->label << " " << vertex2->label << endl;
+	//cout << vertex1->label << " " << vertex2->label << endl;
 	list<Edge*>::iterator it;
 	// Check all the edges out of the first vertex
 	for (it = vertex1->edges.begin(); it != vertex1->edges.end(); it++) {

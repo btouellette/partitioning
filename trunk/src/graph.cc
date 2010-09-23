@@ -156,3 +156,15 @@ void printHypergraph(Hypergraph *hypergraph) {
 		}
 	}
 }
+
+float cut_size(Graph *graph) {
+	float cut = 0.0f;
+	list<Edge*>::iterator e_it;
+	for (e_it = graph->edges.begin(); e_it != graph->edges.end(); e_it++) {
+		Edge *edge = *e_it;
+		if (edge->source->partition != edge->sink->partition) {
+			cut += edge->weight;
+		}
+	}
+	return cut;
+}	

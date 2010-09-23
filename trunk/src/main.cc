@@ -41,13 +41,15 @@ int main(int argc, char *argv[]) {
 
 	// Import the entire file to the graph data structure
 	Hypergraph *hypergraph = import_graph(file);
+	printf("Graph imported\n");
 	//printHypergraph(hypergraph);
 	Graph *graph = convertToGraph(hypergraph);
-	printGraph(graph);
+	printf("Graph converted\n");
+	//printGraph(graph);
 
 	// Call the appropriate starter function for the algorithm specified
 	if (strcmp(algorithm, "kl") == 0) {
-		kl(convertToGraph(hypergraph), num_runs);
+		kl(graph, num_runs);
 	} else if (strcmp(algorithm, "fm") == 0) {
 		fm(num_runs);
 	} else {

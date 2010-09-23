@@ -26,6 +26,9 @@ struct Edge {
 Edge* newEdge(Vertex*, Vertex*);
 Edge* newEdge(Vertex*, Vertex*, float);
 
+bool compare_edges_undirected(Edge*, Edge*);
+bool compare_edges_directed(Edge*, Edge*);
+
 struct Graph {
 	std::list<Edge*> edges;
 	std::list<Vertex*> vertices;
@@ -57,7 +60,6 @@ void addNet(Hypergraph*, Hyperedge*);
 Graph* convertToGraph(Hypergraph*);
 void printHypergraph(Hypergraph*);
 
-bool compare_edges_undirected(Edge*, Edge*);
-bool compare_edges_directed(Edge*, Edge*);
+float cut_size(Graph*);
 
 #endif // PART_GRAPH_H_
