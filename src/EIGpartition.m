@@ -1,20 +1,10 @@
 function [part1, part2, cut] = EIGpartition(A, S, type)
-%% Takes in weighted adjacency matrix A, size constraint S (in form [3,5] 
-%% for 3-5 or 4-4 partition of size 8 set and type of 'ratiocut' or
-%% 'cutsize'
-%%
-%% Returns indices to the nodes to be put in each partition and the
-%% appropriate cutsize or ratiocut
-
-% Adjancency matrix
-% A = [0,  0,  .5, 0,  .5, 0,  0,  0;  ...
-%      0,  0,  .5, .5, 0,  0,  0,  0;  ...
-%      .5, .5, 0,  .5, 1,  .5, 0,  0;  ...
-%      0,  .5, .5, 0,  0,  1,  0,  0;  ...
-%      .5, 0,  1,  0,  0,  .5, 1,  0;  ...
-%      0,  0,  .5, 1,  .5, 0,  .5, .5; ...
-%      0,  0,  0,  0,  1,  .5, 0,  .5; ...
-%      0,  0,  0,  0,  0,  .5, .5, 0]
+% Takes in weighted adjacency matrix A, size constraint S (in form [3,5] 
+% for 3-5 or 4-4 partition of size 8 set and type of 'ratiocut' or
+% 'cutsize'
+%
+% Returns indices to the nodes to be put in each partition and the
+% appropriate cutsize or ratiocut
  
 n = size(A,1);
 
@@ -25,11 +15,11 @@ D = diag(sum(A));
 Q = D - A;
 
 % Get all eigenvalues and their vectors
-[vecs, ] = eig(Q);
+[vecs, vals] = eig(Q);
 
 % Sort the second eigenvalue's vector
 % Z is index vector and will define optimal node ordering
-[, Z] = sort(vecs(:,2));
+[sorted, Z] = sort(vecs(:,2));
 
 % Compute cut size and ratiocut for relevant partitions
 cutsize = sum(sum(A(Z((S(1)+1):n),Z(1:S(1)))))/2;
