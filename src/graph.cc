@@ -1,3 +1,8 @@
+#include <map>
+
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "graph.h"
 
 using namespace std;
@@ -125,14 +130,73 @@ Graph* convertToGraph(Hypergraph *hypergraph) {
 	return graph;
 }
 
+float* convertToAdjacencyMatrix(Graph *graph) {
+	// Matrix size will be n^2 with number of vertices
+	int n = graph->vertices.size();
+	float *matrix = (float *)malloc(n*n*sizeof(float));
+	// Map each label to a specific index in the array
+	map<string,int> indices;
+	list<Vertex*>::iterator v_it;
+	int index = 0;
+	// For every vertex in the graph assign indices to their labels
+	for (v_it = graph->vertices.begin(); v_it != graph->vertices.end(); v_it++) {
+		indices[(*v_it)->label] = index++;
+	}
+	// For every vertex in the graph 
+	for (v_it = graph->vertices.begin(); v_it != graph->vertices.end(); v_it++) {
+		Vertex *vertex = *v_it;
+		int i = indices[vertex->label];
+		list<Edge*>::iterator e_it;
+		// For every edge including this vertex
+		for (e_it = vertex->edges.begin(); e_it != vertex->edges.end(); e_it++) {
+			Edge *edge = *e_it;
+			Vertex *neighbor = (edge->source == vertex) ? edge->sink : edge->source;
+			int k = indices[neighbor->label];
+			// Write the edge weight into the matrix in the appropriate place
+			matrix[i*n + k] = edge->weight;
+		}	
+	}
+	return matrix;
+}
+
+void writeAdjacencyMatrixToDisk(Graph *graph, char *file_name) {
+	// Get the float array corresponding to this graph
+	float *matrix = convertToAdjacencyMatrix(graph); 
+	int n = graph->vertices.size();
+	FILE *file = fopen(file_name, "w");
+	list<Vertex*>::iterator v_it = graph->vertices.begin();
+	// Write all the vertex labels in order at the top of the file
+	while(v_it != graph->vertices.end()) {
+		fprintf(file, "%s", ((*v_it)->label).c_str());
+		v_it++;
+		if (v_it != graph->vertices.end()) {
+			fprintf(file, ",");
+		}
+	}
+	fprintf(file,"\n");
+	for (int i = 0; i < n; i++) {
+		for (int k = 0; k < n; k++) {
+			// Write the float values out in the correct order
+			fprintf(file, "%g", matrix[i*n + k]);
+			if (k != n-1) {
+				fprintf(file, ",");
+			}
+		}
+		fprintf(file,"\n");
+	}
+	fclose(file);
+	free(matrix);
+}
+
 void printGraph(Graph *graph) {
 	list<Edge*> edges = graph->edges;
 	list<Edge*>::iterator e_it;
-	// For every edge
+	// For every edge print the source and sink labels
 	for (e_it = edges.begin(); e_it != edges.end(); e_it++) {
 		cout << "Edge: " << (*e_it)->source->label << "-" << (*e_it)->sink->label << " " << (*e_it)->weight << endl;
 	}
 	list<Vertex*>::iterator v_it;
+	// For every vertex print the corresponding edges and their source and sink labels
 	for (v_it = graph->vertices.begin(); v_it != graph->vertices.end(); v_it++) {
 		cout << "Vertex: " << (*v_it)->label << " " << (*v_it)->edges.size() << endl;
 		edges = (*v_it)->edges;

@@ -7,20 +7,28 @@
 #include "kl.h"
 #include "fm.h"
 
+void printUsage() {
+		printf("** Usage is -in <infile> {-adj <outfile>} {-alg <kl/fm> -runs <num runs>}\n");
+		printf("** adj - write the adjacency matrix for this hypergraph out to a file\n");
+		printf("** kl - Kernighan-Lin partitioning\n");
+		printf("** fm - Fiduccia-Mattheyses partitioning\n");
+}
+
 int main(int argc, char *argv[]) {
-	// Correctly formatted input will have exactly 7 inputs
-	if (argc != 7) {
-		printf("** Usage is -in <infile> -alg <kl/fm> -runs <num runs>\n");
+	if (argc != 9 && argc != 7 && argc != 5) {
+		printUsage();
 		return 1;
 	}
 
 	int num_runs = 0;
-	char *algorithm = NULL, *file = NULL;
+	char *algorithm = NULL, *in_file = NULL, *out_file = NULL;
 	// Run through all the inputs on the command line
 	for (int i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-in") == 0) {
+		if (strcmp(argv[i], "-adj") == 0) {
+			out_file = argv[++i];
+		} else if (strcmp(argv[i], "-in") == 0) {
 			// Import the entire file to the graph data structure
-			file = argv[++i];
+			in_file = argv[++i];
 		} else if (strcmp(argv[i], "-alg") == 0) {
 			// Store the algorithm type
 			algorithm = argv[++i];
@@ -34,26 +42,30 @@ int main(int argc, char *argv[]) {
 			}
 		} else {
 			// Unknown input arguments detected. Report usage and exit abnormally
-			printf("** Usage is -in <infile> -alg <kl/fm> -runs <num runs>\n");
+			printUsage();
 			return 1;
 		}
 	}
 
 	// Import the entire file to the graph data structure
-	Hypergraph *hypergraph = import_graph(file);
-	printf("Graph imported\n");
-	//printHypergraph(hypergraph);
-	Graph *graph = convertToGraph(hypergraph);
-	printf("Graph converted\n");
-	//printGraph(graph);
+	Hypergraph *hypergraph = import_graph(in_file);
+
+	if (out_file != NULL) {
+		Graph *graph = convertToGraph(hypergraph);
+		writeAdjacencyMatrixToDisk(graph, out_file);
+	}
 
 	// Call the appropriate starter function for the algorithm specified
-	if (strcmp(algorithm, "kl") == 0) {
-		kl(graph, num_runs);
-	} else if (strcmp(algorithm, "fm") == 0) {
-		fm(num_runs);
-	} else {
-		printf("** Invalid algorithm. Algorithms supported: kl fm\n");
+	if (algorithm != NULL) {
+		if (strcmp(algorithm, "kl") == 0) {
+			Graph *graph = convertToGraph(hypergraph);
+			kl(graph, num_runs);
+		} else if (strcmp(algorithm, "fm") == 0) {
+			fm(num_runs);
+		} else {
+			printf("** Invalid algorithm.\n");
+			printUsage();
+		}
 	}
 
 	return 0;

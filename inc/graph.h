@@ -58,6 +58,7 @@ struct Hypergraph {
 void addVertex(Hypergraph*, Vertex*);
 void addNet(Hypergraph*, Hyperedge*);
 Graph* convertToGraph(Hypergraph*);
+void writeAdjacencyMatrixToDisk(Graph*, char*);
 void printHypergraph(Hypergraph*);
 
 float cut_size(Graph*);
