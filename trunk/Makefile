@@ -11,7 +11,7 @@ SRCDIR=src
 # Output directory (*.o)
 OBJDIR=out
 # Objects that need to be built
-OBJS=$(OBJDIR)/main.o $(OBJDIR)/kl.o $(OBJDIR)/fm.o $(OBJDIR)/import.o $(OBJDIR)/graph.o
+OBJS=$(OBJDIR)/main.o $(OBJDIR)/kl.o $(OBJDIR)/fm.o $(OBJDIR)/import.o $(OBJDIR)/graph.o $(OBJDIR)/annealing.o $(OBJDIR)/slicing.o
 
 # Default all target builds single binary
 all: $(BIN)
