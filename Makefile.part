@@ -1,9 +1,9 @@
 # Compiler to use
-CC=gcc
+CC=g++
 # Compiler flags
 CFLAGS=-g -c -Wall -Wextra -O3
 # Name of the output binary
-BIN=floor
+BIN=part
 # Include directory (*.h)
 INCS=-I inc
 # Source directory (*.cc)
@@ -11,7 +11,7 @@ SRCDIR=src
 # Output directory (*.o)
 OBJDIR=out
 # Objects that need to be built
-OBJS=$(OBJDIR)/floor.o
+OBJS=$(OBJDIR)/main.o $(OBJDIR)/kl.o $(OBJDIR)/fm.o $(OBJDIR)/import.o $(OBJDIR)/graph.o
 
 # Default all target builds single binary
 all: $(BIN)
@@ -26,7 +26,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.cc
 
 # Run single KL run on test netlist but don't show the command
 test: all
-	@./floor -r 1 -i floor_bench/m10.blk -o test.out -d 0
+	@./part -in ISPD98/ibm01.netD -alg kl -runs 1
 
 # Clean silently (@)
 clean:
