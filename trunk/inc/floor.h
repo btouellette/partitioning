@@ -1,13 +1,20 @@
 #ifndef PART_SLICING_H_
 #define PART_SLICING_H_
 
-typedef unsigned slicing_string;
+typedef unsigned char slicing_string;
 typedef slicing_string slicing_index;
+
+#define V 255
+#define H 254
 
 typedef struct {
 	slicing_index ind;
 	char move_type;
 } move;
+
+typedef struct {
+	int width, height;
+} block;
 
 #define INITIAL_TEMPERATURE 1
 #define COOLING_STEPS 500
