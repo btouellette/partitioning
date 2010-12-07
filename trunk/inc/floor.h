@@ -4,16 +4,16 @@
 typedef unsigned char slicing_string;
 typedef slicing_string slicing_index;
 
-#define MAX_BLOCKS 150
+#define MAX_BLOCKS 151
 
 #define V 255
 #define H 254
 
 // Relative probabilities (integers)
-#define M1_PROB 25
-#define M2_PROB 25
-#define M3_PROB 25
-#define M4_PROB 25
+#define M1_PROB 1
+#define M2_PROB 1
+#define M3_PROB 1
+#define M4_PROB 1
 
 typedef struct {
 	slicing_index index;

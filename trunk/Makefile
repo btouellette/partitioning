@@ -27,7 +27,7 @@ $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 # Run single KL run on test netlist but don't show the command
 test: all
-	@./floor -r 1 -i floor_bench/m10.blk -o test.out -d 0
+	@./floor -r 1 -i floor_bench/m10.blk -d 3
 
 # Clean silently (@)
 clean:
