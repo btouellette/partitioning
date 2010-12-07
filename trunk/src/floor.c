@@ -21,15 +21,16 @@
 	Return S
 */
 
-#define MAX_BLOCKS 150
-
 block *blocks[MAX_BLOCKS];
 FILE *input_ckt, *output_file;
 int debug_level;
+slicing_index num_operands;
+slicing_index num_operators;
 
 slicing_string* initial_solution() {
 	slicing_string *s;
 	//TODO
+	// Add null terminator to string
 	return s;
 }
 
@@ -105,17 +106,36 @@ double cost(slicing_string *s) {
 	return cost_recursive_width(s) * cost_recursive_height(s);
 }
 
-move random_move() {
-	move new_move;
+move* random_move() {
+	move *new_move = (move *)malloc(sizeof(move));
 	//TODO
+	// M1 (Operand Swap): Swap two adjacent operands.
+	// M2 (Chain Invert): Complement some chain (V = H, H = V ).
+	// M3 (Operator/Operand Swap): Swap two adjacent operand and operator.
+	
+	// Select move
+	int selection = rand()%100;
+	if(selection < 33) {
+		new_move->move_type = 1;
+	} else if(selection < 66) {
+		new_move->move_type = 2;
+	} else {
+		new_move->move_type = 3;
+	}
 	return new_move;
 }
 
-void perform_move(move m, slicing_string *s) {
+void perform_move(move *m, slicing_string *s) {
 	//TODO
+	// M1 (Operand Swap): Swap two adjacent operands.
+	// M2 (Chain Invert): Complement some chain (V = H, H = V ).
+	// M3 (Operator/Operand Swap): Swap two adjacent operand and operator.
+	// (the balloting property) for every subexpression Ei = e1 . . . ei, 
+	// 1 ≤ i ≤ 2n − 1, #operands > #operators.
+	// Must check after M3 in case this is broken
 }
 
-void reverse_move(move m, slicing_string *s) {
+void reverse_move(move *m, slicing_string *s) {
 	//TODO
 }
 
@@ -135,7 +155,7 @@ slicing_string* anneal() {
 		start_value = current_value;
 		for(int j = 1; j <= STEPS_PER_TEMP; j++) {
 			/* Pick move */
-			move m = random_move();
+			move *m = random_move();
 			double current_area = cost(s);
 			perform_move(m, s);
 			double delta = cost(s) - current_area;
@@ -147,6 +167,7 @@ slicing_string* anneal() {
 			} else {
 				reverse_move(m, s);
 			}
+			free(m);
 		}
 		if(current_value - start_value < 0.0) {
 			temperature /= COOLING_FRACTION;
@@ -217,7 +238,7 @@ void import_blocks(FILE *in) {
 	char *line = (char *) malloc(num_bytes+1);
 	// Ignore #_of_blocks
 	getline(&line, &num_bytes, in);
-	int index = 0;
+	num_operands = 0;
 	// Stop if we reach EOF (read_bytes == -1)
 	while(getline(&line, &num_bytes, in) >= 0) {
 		int width, height;
@@ -225,10 +246,10 @@ void import_blocks(FILE *in) {
 			printf("** Invalid file");
 			exit(1);
 		}
-		blocks[index] = (block *)malloc(sizeof(block));
-		blocks[index]->width = width;
-		blocks[index]->height = height;
-		index++;
+		blocks[num_operands] = (block *)malloc(sizeof(block));
+		blocks[num_operands]->width = width;
+		blocks[num_operands]->height = height;
+		num_operands++;
 	}
 	free(line);
 	fclose(in);
