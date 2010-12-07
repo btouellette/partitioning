@@ -27,11 +27,14 @@ FILE *input_ckt, *output_file;
 int debug_level;
 
 slicing_string* initial_solution() {
+	if(debug_level > 1) {
+		printf("Generating intial solution...\n");
+	}
 	slicing_string *s = (slicing_string*)malloc(2*MAX_BLOCKS-1);
 	int operands = 0, operators = 0;
 	int num_blocks = 0;
 	int block_used[MAX_BLOCKS];
-	// Init all blocks to unused
+	// Mark all blocks as used or unused (for the string)
 	for(int i = 0; i < MAX_BLOCKS; i++) {
 		if(blocks[i] != NULL) {
 			num_blocks++;
@@ -40,6 +43,9 @@ slicing_string* initial_solution() {
 			// Mark nonexistent blocks as used
 			block_used[i] = 1;
 		}
+	}
+	if(debug_level > 2) {
+		printf("%d total blocks\n", num_blocks);
 	}
 	int i = 0;
 	while(operands < num_blocks) {
@@ -52,16 +58,62 @@ slicing_string* initial_solution() {
 			}
 			s[i] = select;
 			block_used[select] = 1;
+			if(debug_level > 2) {
+				printf("Added %d at position %d\n", select, i);
+			}
 			operands++;
 		} else {
 			// Add operator
-			if(rand()%2 == 0) {
+			// Must satisfy slicing requirement of not having same cuts next to each other
+			if(s[i-1] == H) {
 				s[i] = V;
+				if(debug_level > 2) {
+					printf("Added V at position %d\n", i);
+				}
+			} else if(s[i-1] == V) {
+				s[i] = H;
+				if(debug_level > 2) {
+					printf("Added H at position %d\n", i);
+				}
+			} else if(rand()%2 == 0) {
+				s[i] = V;
+				if(debug_level > 2) {
+					printf("Added V at position %d\n", i);
+				}
 			} else {
 				s[i] = H;
+				if(debug_level > 2) {
+					printf("Added H at position %d\n", i);
+				}
 			}
 			operators++;
 		}
+		i++;
+	}
+	// Add operators until the tree is valid
+	while(operators + operands < 2*num_blocks - 1) {
+		if(s[i-1] == H) {
+			s[i] = V;
+			if(debug_level > 2) {
+				printf("Added V at position %d\n", i);
+			}
+		} else if(s[i-1] == V) {
+			s[i] = H;
+			if(debug_level > 2) {
+				printf("Added H at position %d\n", i);
+			}
+		} else if(rand()%2 == 0) {
+			s[i] = V;
+			if(debug_level > 2) {
+				printf("Added V at position %d\n", i);
+			}
+		} else {
+			s[i] = H;
+			if(debug_level > 2) {
+				printf("Added H at position %d\n", i);
+			}
+		}
+		operators++;
 		i++;
 	}
 	// Add null terminator to string
@@ -359,15 +411,42 @@ slicing_string* anneal() {
 			temperature /= COOLING_FRACTION;
 		}
 	}
+	if(debug_level > 0) {
+		printf("Final Solution:\n");
+		int i = 0;
+		while(s[i] != 0) {
+			if(s[i] == V) {
+				printf("V");
+			} else if(s[i] == H) {
+				printf("H");
+			} else {
+				printf("%d", s[i]);
+			}
+			if(s[i+1] != 0) {
+				printf("-");
+			}
+			i++;
+		}
+		printf("\n");
+	}
 	return s;
 }
 
 void repeated_annealing(int num_runs) {
+	if(debug_level > 0) {
+		printf("Repeated annealing...\n");
+	}
 	slicing_string *best_string = initial_solution();
 	double best_cost = cost(best_string);
+	if(debug_level > 1) {
+		printf("Base cost: %g\n", best_cost);
+	}
 	for(int i = 1; i <= num_runs; i++) {
 		slicing_string *current_string = anneal();
 		double current_cost = cost(current_string);
+		if(debug_level > 1) {
+			printf("New cost: %g\n", current_cost);
+		}
 		if(current_cost < best_cost) {
 			best_cost = current_cost;
 			free(best_string);
@@ -397,7 +476,7 @@ void repeated_annealing(int num_runs) {
 		}
 	}
 	fprintf(output_file, "\n");
-	int i = 0;
+	int i = 1;
 	while(i < MAX_BLOCKS && blocks[i] != NULL) {
 		fprintf(output_file, "%d %d\n", blocks[i]->width, blocks[i]->height);
 	}
@@ -427,7 +506,7 @@ void import_blocks(FILE *in) {
 	char *line = (char *) malloc(num_bytes+1);
 	// Ignore #_of_blocks
 	getline(&line, &num_bytes, in);
-	int num_operands = 0;
+	int i = 1;
 	// Stop if we reach EOF (read_bytes == -1)
 	while(getline(&line, &num_bytes, in) >= 0) {
 		int width, height;
@@ -435,13 +514,13 @@ void import_blocks(FILE *in) {
 			printf("** Invalid file");
 			exit(1);
 		}
-		blocks[num_operands] = (block *)malloc(sizeof(block));
-		blocks[num_operands]->width = width;
-		blocks[num_operands]->height = height;
-		if(debug_level > 1) {
-			printf("Added block %d with w: %d and h: %d\n", num_operands, width, height);
+		blocks[i] = (block *)malloc(sizeof(block));
+		blocks[i]->width = width;
+		blocks[i]->height = height;
+		if(debug_level > 2) {
+			printf("Added block %d with w: %d and h: %d\n", i, width, height);
 		}
-		num_operands++;
+		i++;
 	}
 	free(line);
 	fclose(in);
@@ -451,7 +530,7 @@ void import_blocks(FILE *in) {
 void print_usage() {
 	printf("** Usage is: -r #_of_runs -i input_ckt -o output_file -d debug_level\n");
 	printf("** All parameters but input_ckt are optional\n");
-	printf("** debug_level can be 0, 1, 2\n");
+	printf("** debug_level can be 0-3\n");
 }
 
 int main(int argc, char *argv[]) {
