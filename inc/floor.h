@@ -4,6 +4,8 @@
 typedef unsigned char slicing_string;
 typedef slicing_string slicing_index;
 
+#define MAX_BLOCKS 150
+
 #define V 255
 #define H 254
 
