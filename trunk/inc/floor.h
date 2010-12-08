@@ -25,9 +25,9 @@ typedef struct {
 } block;
 
 #define INITIAL_TEMPERATURE 1
-#define COOLING_STEPS 500 /* higher improves quality, lower speeds up */
-#define COOLING_FRACTION 0.97 /* same */
-#define STEPS_PER_TEMP 1000 /* same */
+#define COOLING_STEPS 800 /* higher improves quality, lower speeds up */
+#define COOLING_FRACTION 0.98 /* same */
+#define STEPS_PER_TEMP 1200 /* same */
 #define E 2.718
 #define K 0.01
 

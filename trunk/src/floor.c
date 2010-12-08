@@ -8,27 +8,14 @@
 
 #include "floor.h"
 
-/*
- Simulated-Annealing()
-	Create initial solution S
-	Initialize temperature t
-	repeat
-	for i = 1 to iteration-length do
-	Generate a random transition from S to Si
-	If (C(S) ≥ C(Si )) then S = Si
-	else if (e(C(S)−C(Si ))/(k·t) > random[0, 1)) then S = Si
-	Reduce temperature t
-	until (no change in C(S))
-	Return S
-*/
-
 block *blocks[MAX_BLOCKS];
+block *best_blocks[MAX_BLOCKS];
 FILE *input_ckt, *output_file;
 int debug_level;
 
 slicing_string* initial_solution() {
 	if(debug_level > 1) {
-		printf("Generating intial solution...\n");
+		printf("Generating initial solution...\n");
 	}
 	slicing_string *s = (slicing_string*)malloc(2*MAX_BLOCKS-1);
 	int operands = 0, operators = 0;
@@ -45,7 +32,7 @@ slicing_string* initial_solution() {
 		}
 	}
 	if(debug_level > 2) {
-		printf("%d total blocks\n", num_blocks);
+		printf(" %d total blocks\n", num_blocks);
 	}
 	int i = 0;
 	while(operands < num_blocks) {
@@ -59,7 +46,7 @@ slicing_string* initial_solution() {
 			s[i] = select;
 			block_used[select] = 1;
 			if(debug_level > 2) {
-				printf("Added %d at position %d\n", select, i);
+				printf("  Added %d at position %d\n", select, i);
 			}
 			operands++;
 		} else {
@@ -68,22 +55,22 @@ slicing_string* initial_solution() {
 			if(s[i-1] == H) {
 				s[i] = V;
 				if(debug_level > 2) {
-					printf("Added V at position %d\n", i);
+					printf("  Added V at position %d\n", i);
 				}
 			} else if(s[i-1] == V) {
 				s[i] = H;
 				if(debug_level > 2) {
-					printf("Added H at position %d\n", i);
+					printf("  Added H at position %d\n", i);
 				}
 			} else if(rand()%2 == 0) {
 				s[i] = V;
 				if(debug_level > 2) {
-					printf("Added V at position %d\n", i);
+					printf("  Added V at position %d\n", i);
 				}
 			} else {
 				s[i] = H;
 				if(debug_level > 2) {
-					printf("Added H at position %d\n", i);
+					printf("  Added H at position %d\n", i);
 				}
 			}
 			operators++;
@@ -95,22 +82,22 @@ slicing_string* initial_solution() {
 		if(s[i-1] == H) {
 			s[i] = V;
 			if(debug_level > 2) {
-				printf("Added V at position %d\n", i);
+				printf("  Added V at position %d\n", i);
 			}
 		} else if(s[i-1] == V) {
 			s[i] = H;
 			if(debug_level > 2) {
-				printf("Added H at position %d\n", i);
+				printf("  Added H at position %d\n", i);
 			}
 		} else if(rand()%2 == 0) {
 			s[i] = V;
 			if(debug_level > 2) {
-				printf("Added V at position %d\n", i);
+				printf("  Added V at position %d\n", i);
 			}
 		} else {
 			s[i] = H;
 			if(debug_level > 2) {
-				printf("Added H at position %d\n", i);
+				printf("  Added H at position %d\n", i);
 			}
 		}
 		operators++;
@@ -118,7 +105,7 @@ slicing_string* initial_solution() {
 	}
 	// Add null terminator to string
 	s[i] = 0;
-	if(debug_level > 0) {
+	if(debug_level > 1) {
 		printf("Initial Solution:\n");
 		i = 0;
 		while(s[i] != 0) {
@@ -217,18 +204,26 @@ move* random_move(slicing_string *s) {
 	// M3 (Operator/Operand Swap): Swap two adjacent operand and operator.
 	// M4 (Rotation of Operand)
 
-	move *new_move = (move *)malloc(sizeof(move));
+	if(debug_level > 2) {
+		printf(" Making random move...\n");
+	}
+
+	move *new_move = (move*)malloc(sizeof(move));
 	
 	// Select move
 	int selection = rand()%(M1_PROB+M2_PROB+M3_PROB+M4_PROB);
 	if(selection < M1_PROB) {
 		new_move->move_type = 1;
-	} else if(selection < M2_PROB) {
+	} else if(selection < M1_PROB + M2_PROB) {
 		new_move->move_type = 2;
-	} else if(selection < M3_PROB) {
+	} else if(selection < M1_PROB + M2_PROB + M3_PROB) {
 		new_move->move_type = 3;
 	} else {
 		new_move->move_type = 4;
+	}
+
+	if(debug_level > 2) {
+		printf("  Selected M%d\n", new_move->move_type);
 	}
 
 	// Select index
@@ -297,21 +292,24 @@ move* random_move(slicing_string *s) {
 		int choices = 0;
 		int i = 0;
 		while(s[i] != 0) {
-			// Verifty this is an operand
-			if(s[i] != V && s[i] != H && s[i] != 0) {
+			// Verify this is an operand
+			if(s[i] != V && s[i] != H) {
 				choices++;
 			}
 			i++;
 		}
 		int choice = rand()%choices;
-		i = 0;
+		i = -1;
 		while(choice >= 0) {
 			i++;
-			if(s[i] != V && s[i] != H && s[i] != 0) {
-				choices--;
+			if(s[i] != V && s[i] != H) {
+				choice--;
 			}
 		}
 		new_move->index = i;
+	}
+	if(debug_level > 2) {
+		printf("  Selected index %d\n", new_move->index);
 	}
 	return new_move;
 }
@@ -378,6 +376,21 @@ void reverse_move(move *m, slicing_string *s) {
 }
 
 slicing_string* anneal() {
+	/* Simulated-Annealing()
+	 * Create initial solution S
+	 * Initialize temperature t
+	 * repeat:
+	 *     for i = 1 to iteration-length do
+	 *         Generate a random transition from S to Si
+	 *         If (C(S) ≥ C(Si )) then S = Si
+	 *         else if (e(C(S)−C(Si ))/(k·t) > random[0, 1)) then S = Si
+	 *     Reduce temperature t
+	 *     until (no change in C(S))
+	 * Return S
+	 */
+	if(debug_level > 1) {
+		printf("Annealing...\n");
+	}
 	double current_value;
 	double start_value;
 	double temperature;
@@ -411,7 +424,7 @@ slicing_string* anneal() {
 			temperature /= COOLING_FRACTION;
 		}
 	}
-	if(debug_level > 0) {
+	if(debug_level > 1) {
 		printf("Final Solution:\n");
 		int i = 0;
 		while(s[i] != 0) {
@@ -438,19 +451,29 @@ void repeated_annealing(int num_runs) {
 	}
 	slicing_string *best_string = initial_solution();
 	double best_cost = cost(best_string);
-	if(debug_level > 1) {
+	if(debug_level > 0) {
 		printf("Base cost: %g\n", best_cost);
 	}
 	for(int i = 1; i <= num_runs; i++) {
 		slicing_string *current_string = anneal();
 		double current_cost = cost(current_string);
-		if(debug_level > 1) {
-			printf("New cost: %g\n", current_cost);
+		if(debug_level > 0) {
+			printf("Run cost: %g\n", current_cost);
 		}
 		if(current_cost < best_cost) {
 			best_cost = current_cost;
 			free(best_string);
 			best_string = current_string;
+			// Copy the blocks over to preserve orientation
+			int k = 1;
+			while(k < MAX_BLOCKS && blocks[k] != NULL) {
+				if(best_blocks[k] == NULL) {
+					best_blocks[k] = (block*)malloc(sizeof(block));
+				}
+				best_blocks[k]->width = blocks[k]->width;
+				best_blocks[k]->height = blocks[k]->height;
+				k++;
+			}
 		} else {
 			free(current_string);
 		}
@@ -476,9 +499,12 @@ void repeated_annealing(int num_runs) {
 		}
 	}
 	fprintf(output_file, "\n");
+	fprintf(output_file, "Final Cost: %g\n", best_cost);
+	fprintf(output_file, "Blocks:\n");
 	int i = 1;
-	while(i < MAX_BLOCKS && blocks[i] != NULL) {
-		fprintf(output_file, "%d %d\n", blocks[i]->width, blocks[i]->height);
+	while(i < MAX_BLOCKS && best_blocks[i] != NULL) {
+		fprintf(output_file, "%d %d\n", best_blocks[i]->width, best_blocks[i]->height);
+		i++;
 	}
 	fclose(output_file);
 	free(best_string);
@@ -491,6 +517,7 @@ void import_blocks(FILE *in) {
 	// NULL initialize the blocks array
 	for(int i = 0; i < MAX_BLOCKS; i++) {
 		blocks[i] = NULL;
+		best_blocks[i] = NULL;
 	}
 	/* File format:
 	 * #_of_blocks
@@ -503,7 +530,7 @@ void import_blocks(FILE *in) {
 		exit(1);
 	}
 	size_t num_bytes = 20;
-	char *line = (char *) malloc(num_bytes+1);
+	char *line = (char*)malloc(num_bytes+1);
 	// Ignore #_of_blocks
 	getline(&line, &num_bytes, in);
 	int i = 1;
@@ -514,11 +541,11 @@ void import_blocks(FILE *in) {
 			printf("** Invalid file");
 			exit(1);
 		}
-		blocks[i] = (block *)malloc(sizeof(block));
+		blocks[i] = (block*)malloc(sizeof(block));
 		blocks[i]->width = width;
 		blocks[i]->height = height;
 		if(debug_level > 2) {
-			printf("Added block %d with w: %d and h: %d\n", i, width, height);
+			printf("  Added block %d with w: %d and h: %d\n", i, width, height);
 		}
 		i++;
 	}
@@ -558,11 +585,32 @@ int main(int argc, char *argv[]) {
 
 	srand(time(NULL));
 	import_blocks(input_ckt);
+	
+	// Compare annealing with Monte Carlo
+	int tmp = debug_level;
+	debug_level = 0;
+	slicing_string *s = initial_solution();
+	double best_cost = cost(s);
+	free(s);
+	for(int i = 0; i < r*3; i++) {
+		s = initial_solution();
+		double new_cost = cost(s);
+		free(s);
+		best_cost = new_cost < best_cost ? new_cost : best_cost;
+	}
+	debug_level = tmp;
+	if(debug_level > 0) {
+		printf("Monte Carlo best cost: %g\n", best_cost);
+	}
+
 	repeated_annealing(r);
 
 	for(int i = 0; i < MAX_BLOCKS; i++) {
 		if(blocks[i] != NULL) {
 			free(blocks[i]);
+		}
+		if(best_blocks[i] != NULL) {
+			free(best_blocks[i]);
 		}
 	}
 
