@@ -227,86 +227,104 @@ move* random_move(slicing_string *s) {
 	}
 
 	// Select index
-	if(new_move->move_type == 1) {
-		int choices = 0;
-		int i = 0;
-		while(s[i] != 0) {
-			// Verify this and the next are both operands
-			if(s[i] != V && s[i] != H && s[i+1] != V && s[i+1] != H && s[i+1] != 0) {
-				choices++;
+	switch(new_move->move_type) {
+		case 1:
+		{
+			int choices = 0;
+			int i = 0;
+			while(s[i] != 0) {
+				// Verify this and the next are both operands
+				if(s[i] != V && s[i] != H && s[i+1] != V && s[i+1] != H && s[i+1] != 0) {
+					choices++;
+				}
+				i++;
 			}
-			i++;
-		}
-		int choice = rand()%choices;
-		i = -1;
-		while(choice >= 0) {
-			i++;
-			if(s[i] != V && s[i] != H && s[i+1] != V && s[i+1] != H && s[i+1] != 0) {
-				choice--;
+			int choice = rand()%choices;
+			i = -1;
+			while(choice >= 0) {
+				i++;
+				if(s[i] != V && s[i] != H && s[i+1] != V && s[i+1] != H && s[i+1] != 0) {
+					choice--;
+				}
 			}
+			new_move->index = i;
+			break;
 		}
-		new_move->index = i;
-	} else if(new_move->move_type == 2) {
-		int choices = 0;
-		int i = 1;
-		while(s[i] != 0) {
-			// Identify the start of a chain
-			if((s[i] == V || s[i] == H) && s[i-1] != V && s[i-1] != H) {
-				choices++;
+		case 2:
+		{
+			int choices = 0;
+			int i = 1;
+			while(s[i] != 0) {
+				// Identify the start of a chain
+				if((s[i] == V || s[i] == H) && s[i-1] != V && s[i-1] != H) {
+					choices++;
+				}
+				i++;
 			}
-			i++;
-		}
-		int choice = rand()%choices;
-		i = 0;
-		while(choice >= 0) {
-			i++;
-			if((s[i] == V || s[i] == H) && s[i-1] != V && s[i-1] != H) {
-				choice--;
+			int choice = rand()%choices;
+			i = 0;
+			while(choice >= 0) {
+				i++;
+				if((s[i] == V || s[i] == H) && s[i-1] != V && s[i-1] != H) {
+					choice--;
+				}
 			}
+			new_move->index = i;
+			break;
 		}
-		new_move->index = i;
-	} else if(new_move->move_type == 3) {
-		int choices = 0;
-		int i = 1;
-		while(s[i] != 0) {
-			// Verify this and the next are opposite types
-			if((((s[i] != V && s[i] != H) && (s[i+1] == V || s[i+1] == H)) ||
-			    ((s[i] == V || s[i] == H) && (s[i+1] != V && s[i+1] != H))) &&
-			   s[i+1] != 0) {
-				choices++;
+		case 3:
+		{
+			int choices = 0;
+			int i = 1;
+			while(s[i] != 0) {
+				// Verify this and the next are opposite types
+				if((((s[i] != V && s[i] != H) && (s[i+1] == V || s[i+1] == H)) ||
+					((s[i] == V || s[i] == H) && (s[i+1] != V && s[i+1] != H))) &&
+				   s[i+1] != 0) {
+					choices++;
+				}
+				i++;
 			}
-			i++;
-		}
-		int choice = rand()%choices;
-		i = 0;
-		while(choice >= 0) {
-			i++;
-			if((((s[i] != V && s[i] != H) && (s[i+1] == V || s[i+1] == H)) ||
-			    ((s[i] == V || s[i] == H) && (s[i+1] != V && s[i+1] != H))) &&
-			   s[i+1] != 0) {
-				choice--;
+			int choice = rand()%choices;
+			i = 0;
+			while(choice >= 0) {
+				i++;
+				if((((s[i] != V && s[i] != H) && (s[i+1] == V || s[i+1] == H)) ||
+					((s[i] == V || s[i] == H) && (s[i+1] != V && s[i+1] != H))) &&
+				   s[i+1] != 0) {
+					choice--;
+				}
 			}
+			new_move->index = i;
+			break;
 		}
-		new_move->index = i;
-	} else {
-		int choices = 0;
-		int i = 0;
-		while(s[i] != 0) {
-			// Verify this is an operand
-			if(s[i] != V && s[i] != H) {
-				choices++;
+		case 4:
+		{
+			int choices = 0;
+			int i = 0;
+			while(s[i] != 0) {
+				// Verify this is an operand
+				if(s[i] != V && s[i] != H) {
+					choices++;
+				}
+				i++;
 			}
-			i++;
-		}
-		int choice = rand()%choices;
-		i = -1;
-		while(choice >= 0) {
-			i++;
-			if(s[i] != V && s[i] != H) {
-				choice--;
+			int choice = rand()%choices;
+			i = -1;
+			while(choice >= 0) {
+				i++;
+				if(s[i] != V && s[i] != H) {
+					choice--;
+				}
 			}
+			new_move->index = i;
+			break;
 		}
-		new_move->index = i;
+		default:
+		{
+			printf("Illegal situation @%s:%d", __FILE__, __LINE__);
+			break;
+		}
 	}
 	if(debug_level > 2) {
 		printf("  Selected index %d\n", new_move->index);
@@ -340,8 +358,10 @@ void perform_move(move *m, slicing_string *s) {
 	// M4 (Rotation of Operand)
 	switch(m->move_type) {
 		case 1:
+		{
 			swap(s[m->index], s[m->index+1], slicing_string);
 			break;
+		}
 		case 2:
 		{
 			int index = m->index;
@@ -356,17 +376,23 @@ void perform_move(move *m, slicing_string *s) {
 			break;
 		}
 		case 3:
+		{
 			swap(s[m->index], s[m->index+1], slicing_string);
 			if(satisfies_balloting(s) == FALSE) {
 				swap(s[m->index], s[m->index+1], slicing_string);
 			}
 			break;
+		}
 		case 4:
+		{
 			swap(blocks[s[m->index]]->width, blocks[s[m->index]]->height, int);
 			break;
+		}
 		default:
+		{
 			printf("Illegal situation @%s:%d", __FILE__, __LINE__);
 			break;
+		}
 	}
 }
 
@@ -452,13 +478,13 @@ void repeated_annealing(int num_runs) {
 	slicing_string *best_string = initial_solution();
 	double best_cost = cost(best_string);
 	if(debug_level > 0) {
-		printf("Base cost: %g\n", best_cost);
+		printf("Base cost: %d\n", (int)best_cost);
 	}
 	for(int i = 1; i <= num_runs; i++) {
 		slicing_string *current_string = anneal();
 		double current_cost = cost(current_string);
 		if(debug_level > 0) {
-			printf("Run cost: %g\n", current_cost);
+			printf("Run cost: %d\n", (int)current_cost);
 		}
 		if(current_cost < best_cost) {
 			best_cost = current_cost;
@@ -499,7 +525,9 @@ void repeated_annealing(int num_runs) {
 		}
 	}
 	fprintf(output_file, "\n");
-	fprintf(output_file, "Final Cost: %g\n", best_cost);
+	if(debug_level > 0) {
+		printf("Annealing best cost: %d from %d runs\n", (int)best_cost, num_runs);
+	}
 	fprintf(output_file, "Blocks:\n");
 	int i = 1;
 	while(i < MAX_BLOCKS && best_blocks[i] != NULL) {
@@ -592,7 +620,7 @@ int main(int argc, char *argv[]) {
 	slicing_string *s = initial_solution();
 	double best_cost = cost(s);
 	free(s);
-	for(int i = 0; i < r*3; i++) {
+	for(int i = 0; i < r*20; i++) {
 		s = initial_solution();
 		double new_cost = cost(s);
 		free(s);
@@ -600,7 +628,7 @@ int main(int argc, char *argv[]) {
 	}
 	debug_level = tmp;
 	if(debug_level > 0) {
-		printf("Monte Carlo best cost: %g\n", best_cost);
+		printf("Monte Carlo best cost: %d from %d runs\n", (int)best_cost,  20*r);
 	}
 
 	repeated_annealing(r);

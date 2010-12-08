@@ -2,7 +2,6 @@
 #define PART_SLICING_H_
 
 typedef unsigned char slicing_string;
-typedef slicing_string slicing_index;
 
 #define MAX_BLOCKS 151
 
@@ -16,7 +15,7 @@ typedef slicing_string slicing_index;
 #define M4_PROB 1
 
 typedef struct {
-	slicing_index index;
+	int index;
 	char move_type;
 } move;
 
