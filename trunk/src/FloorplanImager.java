@@ -24,7 +24,9 @@ public class FloorplanImager extends JPanel {
 	TreeNode root;
 	
 	public FloorplanImager(String inputFile) {
+		// Read in the file and create tree
 		read(inputFile);
+		// Figure out coords for each module
 		assignXY();
 	}
 
@@ -37,31 +39,45 @@ public class FloorplanImager extends JPanel {
 
 	private int assignY(TreeNode node, int currentY) {
 		if(!node.V && !node.H) {
+			// If we are at a module give it the currentY value
 			blocks.get(node.index).y = currentY - blocks.get(node.index).height;
+			// Height of this subtree is module height
 			return blocks.get(node.index).height;
 		} else if(node.V) {
+			// Both subtrees are at thi Y value for V
 			int newHeight1 = assignY(node.left, currentY);
 			int newHeight2 = assignY(node.right, currentY);
 			int maxHeight = (newHeight1 > newHeight2) ? newHeight1 : newHeight2;
+			// Height of V subtree is max of children
 			return maxHeight;
 		}
+		// Left tree gets this Y
 		int leftHeight = assignY(node.left, currentY);
+		// Right tree gets Y above left tree
 		int rightHeight = assignY(node.right, currentY - leftHeight);
+		// Height of H subtree is sum of children
 		return leftHeight + rightHeight;
 	}
 
 	private int assignX(TreeNode node, int currentX) {
 		if(!node.V && !node.H) {
+			// If we are at a module give it the currentX value
 			blocks.get(node.index).x = currentX;
+			// Width of this subtree is module width
 			return blocks.get(node.index).width;
 		} else if(node.H) {
+			// Both subtrees are at this X value for H
 			int newWidth1 = assignX(node.left, currentX);
 			int newWidth2 = assignX(node.right, currentX);
 			int maxWidth = (newWidth1 > newWidth2) ? newWidth1 : newWidth2;
+			// Width of H subtree is max of children
 			return maxWidth;
 		}
+		// Left tree gets this X
 		int leftWidth = assignX(node.left, currentX);
+		// Right tree gets X at end of left tree
 		int rightWidth = assignX(node.right, currentX + leftWidth);
+		// Width of V subtree is sum of children
 		return leftWidth + rightWidth;
 	}
 
@@ -89,19 +105,19 @@ public class FloorplanImager extends JPanel {
 			tokens.add(st.nextToken());
 		}
 		root = new TreeNode();
+		// Flip the string so we can iterate forwards through it
 		Collections.reverse(tokens);
 		createSubTree(root, tokens);
 	}
 
 	private void createSubTree(TreeNode node, List<String> tokens) {
-		System.out.println(tokens);
 		String id = tokens.get(0);
 		if("V".equals(id) || "H".equals(id)) {
 			node.V = "V".equals(id);
 			node.H = "H".equals(id);
-			node.left = new TreeNode();
-			createSubTree(node.left, tokens.subList(1, tokens.size()));
 			node.right = new TreeNode();
+			createSubTree(node.right, tokens.subList(1, tokens.size()));
+			node.left = new TreeNode();
 			// Use for counting the size of the first subtree
 			int size = 1;
 			int index = 0;
@@ -115,13 +131,14 @@ public class FloorplanImager extends JPanel {
 					size--;
 				}
 			} while(size > 0);
-			createSubTree(node.right, tokens.subList(index+1, tokens.size()));
+			createSubTree(node.left, tokens.subList(index+1, tokens.size()));
 		} else {
 			node.index = Integer.parseInt(id) - 1;
 		}
 	}
 
 	private void read(String inputFile) {
+		// Pull in the file and create the array of modules
 		Scanner scanner;
 		try {
 			scanner = new Scanner(new FileInputStream(inputFile));
@@ -148,6 +165,7 @@ public class FloorplanImager extends JPanel {
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D)g;
 
+		// Draw each module with a random color and a black border
 		Random gen = new Random();
 		for(Rectangle2D rect : blocks) {
 			g2.setColor(new Color(gen.nextInt(256), gen.nextInt(256), gen.nextInt(256)));
