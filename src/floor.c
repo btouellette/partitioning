@@ -129,14 +129,14 @@ slicing_string* initial_solution() {
 	return s;
 }
 
-double cost_recursive_width(slicing_string *s) {
+double cost_width(slicing_string *s) {
 	slicing_string node = *s;
 	// If we are at a terminal return the width
 	if(node != V && node != H) {
 		return blocks[node]->width;
 	}
 	double width1, width2;
-	width1 = cost_recursive_width(s-1);
+	width1 = cost_width(s-1);
 	// Size of the subtree to the right/top
 	int size = 1;
 	while(size > 0) {
@@ -152,7 +152,7 @@ double cost_recursive_width(slicing_string *s) {
 	}
 	// Now at the last element in the first subtree
 	s--;
-	width2 = cost_recursive_width(s);
+	width2 = cost_width(s);
 	// For a vertical cut sum the widths
 	if(node == V) {
 		return width1 + width2;
@@ -161,14 +161,14 @@ double cost_recursive_width(slicing_string *s) {
 	return (width1 > width2) ? width1 : width2;
 }
 
-double cost_recursive_height(slicing_string *s) {
+double cost_height(slicing_string *s) {
 	slicing_string node = *s;
 	// If we are at a terminal return the height
 	if(node != V && node != H) {
 		return blocks[node]->height;
 	}
 	double height1, height2;
-	height1 = cost_recursive_height(s-1);
+	height1 = cost_height(s-1);
 	// Size of the subtree to the right/top
 	int size = 1;
 	while(size > 0) {
@@ -184,7 +184,7 @@ double cost_recursive_height(slicing_string *s) {
 	}
 	// Now at the last element in the first subtree
 	s--;
-	height2 = cost_recursive_height(s);
+	height2 = cost_height(s);
 	// For a horizontal cut sum the heights
 	if(node == H) {
 		return height1 + height2;
@@ -198,7 +198,7 @@ double cost(slicing_string *s) {
 	while(*(++s) != 0) ;
 	// Move the string back to the final element
 	s--;
-	return cost_recursive_width(s) * cost_recursive_height(s);
+	return cost_width(s) * cost_height(s);
 }
 
 move* random_move(slicing_string *s) {
